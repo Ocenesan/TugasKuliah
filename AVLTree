@@ -1,0 +1,199 @@
+import java.util.Scanner;
+//Class AVLTree berisi class Node dan method-method insert(), leftRotate(), rightRotate(), countBalanceFactor().
+class AVLTree {
+    Node root;
+
+    class Node {
+        int data, height;
+        Node left, right;
+    
+        Node(int d) {
+            data = d;
+            height = 1;
+        }
+    }
+
+    int height(Node node) {
+        if (node == null) {
+            return 0;
+        }
+        return node.height;
+    }
+
+    int max(int a, int b) {
+        return (a > b) ? a : b;
+    }
+
+//method rotate ke kanan.
+    Node rightRotate(Node y) {
+        Node x = y.left;
+        Node T2 = x.right;
+
+        x.right = y;
+        y.left = T2;
+
+        y.height = max(height(y.left), height(y.right)) + 1;
+        x.height = max(height(x.left), height(x.right)) + 1;
+
+        return x;
+    }
+
+//method rotate ke kiri.
+    Node leftRotate(Node x) {
+        Node y = x.right;
+        Node T2 = y.left;
+
+        y.left = x;
+        x.right = T2;
+
+        x.height = max(height(x.left), height(x.right)) + 1;
+        y.height = max(height(y.left), height(y.right)) + 1;
+
+        return y;
+    }
+
+//menghitung dan mengecek imbalance dari node.
+    int countBalanceFactor(Node node) {
+        if (node == null) {
+            return 0;
+        }
+        return height(node.left) - height(node.right);
+    }
+
+//method untuk menambahkan node baru.
+    Node insert(Node node, int data) {
+        if (node == null) {
+            return (new Node(data));
+        }
+
+        if (data < node.data) {
+            node.left = insert(node.left, data);
+        } else if (data > node.data) {
+            node.right = insert(node.right, data);
+        } else {
+            return node;
+        }
+
+        node.height = 1 + max(height(node.left), height(node.right));
+
+        int balance = countBalanceFactor(node);
+
+        if (balance > 1 && data < node.left.data) {
+            return rightRotate(node);
+        }
+
+        if (balance < -1 && data > node.right.data) {
+            return leftRotate(node);
+        }
+
+        if (balance > 1 && data > node.left.data) {
+            node.left = leftRotate(node.left);
+            return rightRotate(node);
+        }
+
+        if (balance < -1 && data < node.right.data) {
+            node.right = rightRotate(node.right);
+            return leftRotate(node);
+        }
+
+        return node;
+    }
+
+//method-method buat nyusun dan ngeprint tree berdasarkan order traversalnya.
+    void printPreorder(Node node, int level) {
+        if (node != null) {
+            for (int i = 0; i < level; i++) {
+                System.out.print("--");
+            }
+            System.out.println(node.data);
+            printPreorder(node.left, level + 1);
+            printPreorder(node.right, level + 1);
+        }
+    }
+
+    void printInorder(Node node, int level) {
+        if (node != null) {
+            printInorder(node.left, level + 1);
+            for (int i = 0; i < level; i++) {
+                System.out.print("--");
+            }
+            System.out.println(node.data);
+            printInorder(node.right, level + 1);
+        }
+    }
+
+    void printPostorder(Node node, int level) {
+        if (node != null) {
+            printPostorder(node.left, level + 1);
+            printPostorder(node.right, level + 1);
+
+            for (int i = 0; i < level; i++) {
+                System.out.print("--");
+            }
+            System.out.println(node.data);
+        }
+    }
+
+//method untuk menghitung level/tingkatan tree berdasarkan nilai height.
+//Awalnya pake yang manual cek kanan kiri dulu tapi karna lebih singkat pake height jadi kami ganti.
+    int countLevels(Node node) {
+        if (node == null) {
+            return 0;
+        }
+        int height = node.height;
+        return height;
+    }    
+}
+
+//main class untuk memasukkan input dan mengeluarkan output.
+public class AVLMain {
+    public static void main(String[] args) {
+        AVLTree tree = new AVLTree();
+        Scanner in = new Scanner(System.in);
+
+        while (true) {
+            String command = in.next();
+            switch (command) {
+                case "insert":
+                    int x = in.nextInt();
+                    tree.root = tree.insert(tree.root, x);
+                    break;
+                case "print":
+                    String traversal = in.next();
+                    switch (traversal) {
+                        case "preorder":
+                            System.out.println("Hasil Pre-Order: ");
+                            tree.printPreorder(tree.root, 0);
+                            System.out.println();
+                            break;
+                        case "inorder":
+                            System.out.println("Hasil In-Order: ");
+                            tree.printInorder(tree.root, 0);
+                            System.out.println();
+                            break;
+                        case "postorder":
+                            System.out.println("Hasil Post-Order: ");
+                            tree.printPostorder(tree.root, 0);
+                            System.out.println();
+                            break;
+                        case "levels":
+                            if (tree.root == null) {
+                                System.out.println("Pohon kosong.");
+                            } else {
+                                int levels = tree.countLevels(tree.root);
+                                System.out.println("Jumlah level: " + levels);
+                                System.out.println();
+                            }
+                            break;
+                        default:
+                            System.out.println("Perintah tidak valid");
+                    }
+                    break;
+                case "exit":
+                    System.out.println("Program Berakhir.");
+                    System.exit(0);
+                    break;
+            }
+        }
+    }
+}
