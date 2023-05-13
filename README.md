@@ -1,2 +1,2 @@
 # TugasKuliah
-Isinya tugas-tugas gweh
+// Arsip yang isinya tugas-tugas gweh, penjelasan tambahan menyusul.
